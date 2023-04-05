@@ -18,6 +18,12 @@ def read(length_min=1, length_max=100, message=None):
             return text
 
 
+def valid_value(name):
+    if name.isalpha() or name.isspace() and 2 <= len(name) <= 30:
+        return True
+    else:
+        return False
+
 def valid_book(name, b_list):
 
     for book in b_list:

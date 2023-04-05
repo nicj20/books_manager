@@ -61,8 +61,8 @@ class Create_Book_Window(Toplevel, CenterWidgetMixing):
     def create_book(self):
         self.master.treeview.insert(
             parent='', index='end', iid=self.name.get(),
-            values=(self.score.get(), self.name.get(), self.author.get()))
-        mg.Books.add_book(self.score.get(), self.name.get(), self.author.get())
+            values=(int(self.score.get()), self.name.get().upper(), self.author.get().upper()))
+        mg.Books.add_book(int(self.score.get()), self.name.get().upper(), self.author.get().upper())
         self.close()
 
     def close(self):
@@ -70,6 +70,7 @@ class Create_Book_Window(Toplevel, CenterWidgetMixing):
         self.update
 
     def validate(self, event, index):
+        valid = False
         value = event.widget.get()
         if index == 0:
             valid = helpers.valid_book(value, mg.Books.books_list)
@@ -79,14 +80,17 @@ class Create_Book_Window(Toplevel, CenterWidgetMixing):
                 event.widget.configure({"bg": "Red"})
 
         if index == 1:
-            valid = value.isnumeric() and 1 <= len(value) <= 2
-            if valid:
-                event.widget.configure({"bg": "Green"})
-            else:
+            try:
+                valid = int(value) in list(range(1, 11))
+                if valid:
+                    event.widget.configure({"bg": "Green"})
+                else:
+                    event.widget.configure({"bg": "Red"})
+            except ValueError:
                 event.widget.configure({"bg": "Red"})
 
         if index == 2:
-            valid = value.isalpha() and 2 <= len(value) <= 30
+            valid = 2 <= len(value) <= 30
             if valid:
                 event.widget.configure({"bg": "Green"})
             else:
@@ -147,11 +151,11 @@ class Modify_Book_Window(Toplevel, CenterWidgetMixing):
     def edit_book(self):
         book = self.master.treeview.focus()
         self.master.treeview.item(book, values=(
-            self.score.get(),
-            self.name.get(),
-            self.author.get()
+            int(self.score.get()),
+            self.name.get().upper(),
+            self.author.get().upper()
         ))
-        mg.Books.modify_book(self.score.get(), self.name.get(), self.author.get())
+        mg.Books.modify_book(int(self.score.get()), self.name.get().upper(), self.author.get().upper())
         self.close()
 
     def close(self):
@@ -160,22 +164,26 @@ class Modify_Book_Window(Toplevel, CenterWidgetMixing):
 
     def validate(self, event, index):
         value = event.widget.get()
+        valid = False
         if index == 0:
-            valid = value.isdigit and 1 <= len(value) <= 1
-            if valid:
-                event.widget.configure({"bg": "Green"})
-            else:
+            try:
+                valid = int(value) in list(range(1, 11))
+                if valid:
+                    event.widget.configure({"bg": "Green"})
+                else:
+                    event.widget.configure({"bg": "Red"})
+            except ValueError:
                 event.widget.configure({"bg": "Red"})
 
         if index == 1:
-            valid = value.isalpha and 2 <= len(value) <= 30
+            valid = 2 <= len(value) <= 30
             if valid:
                 event.widget.configure({"bg": "Green"})
             else:
                 event.widget.configure({"bg": "Red"})
 
         if index == 2:
-            valid = value.isalpha() and 2 <= len(value) <= 30
+            valid = 2 <= len(value) <= 30
             if valid:
                 event.widget.configure({"bg": "Green"})
             else:
@@ -244,7 +252,7 @@ class MainWindow(Tk, CenterWidgetMixing):
                 icon=WARNING)
             if confirm:
                 self.treeview.delete(book)
-                mg.Books.delete_book(row[0])
+                mg.Books.delete_book(book)
 
     def create(self):
         Create_Book_Window(self)
